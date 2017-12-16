@@ -32,9 +32,29 @@ let fakeProduct = () =>{
       console.log(saved);
     });
 };
+// fetch all from database
+let fetchAllFromPg = () =>{
+  Product.fetchAll().then((data)=>{
+    let array = [];
+    let br = [];
+    data.forEach((model)=>{
+      array.push(model.attributes);
+    });
+    array.forEach((each)=>{
+      delete each.id;
+      delete each['inventory count'];
+    });
+    array.forEach((item, i)=>{
+      br.push({index: {_index: 'product', _type: 'product', _id: i}});
+      br.push({item});
+    });
+    console.log(br);
+  });
+};
 
 exports.fakerUser = fakerUser;
 exports.fakeProduct = fakeProduct;
+exports.fetchAllFromPg = fetchAllFromPg;
 // dont have product id will go of regular id for now. will have to get product id when it is hooked up
 // table.increments('id').primary();
 // table.integer('product id');
