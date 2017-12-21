@@ -5,6 +5,12 @@ var fake = require('./faker.js');// mongo
 const elasticsearch = require('elasticsearch');
 const bookshelf = require('./../database-pg/bookshelf.js');
 const Product = require('./../database-pg/userModels.js');
+const fakeProductData = require('./../fakeProductData.txt');
+var Promise = require('bluebird');
+var fs = Promise.promisifyAll(require('fs'));
+var axios = require('axios');
+
+
 
 const app = express();
 
@@ -18,8 +24,8 @@ app.use(bodyParser.json());
 
 //var easak = require('greatness');//sike
 // fake.fakerUser() //generate fake users
-// for (var i = 0; i < 1000; i++) {
-//   fake.fakeProduct();
+// for (var i = 0; i < 100000; i++) {
+//   fake.fakeProduct();// fake product
 // }
 client.ping({
   // ping usually has a 3000ms timeout
@@ -33,61 +39,74 @@ client.ping({
 });
 
 app.get('/search', (req, res)=>{
+  let count = 0;
   let data = req.query.product;
-  console.log(data);
-
-  client.search({
+  //console.log(count);
+  count++;
+  console.log(count);
+  let searchParam = {
     index: 'product',
-    q: data
-  }, (err, response)=>{
+    body: {
+      query: {
+        bool: {
+          must: {
+            match: {
+              'item.product name': data
+            }
+          }
+        }
+      }
+    }
+  };
+
+  client.search(searchParam, (err, response)=>{
     if (err) {
-      console.log(err);
+      console.log(err, 'err');
     } else {
       res.send(200, response);
-      console.log(response);
+      //console.log(response);
     }
   });
-
-
-
 });
 
-app.get('/product', (req, res)=>{
-
-
+app.get('/productInfo', (req, res)=>{
+  // get product info by makeing search to elastic search with the id.
+  //make a get request to bundle items.
+  // display id to send to purchase
+  // test id is 64116 ergonmic plastic mouse
+  let productId = req.query.chosenProduct;
+  console.log(productId, 'product id');
+  let searchParam = {index: 'product', q: productId};
+  return client.search(searchParam)
+    .then((resp)=>{
+      return resp;
+    }).then((resp)=>{
+      let productDesc = [];// might change to object
+      productDesc.push(resp);
+      axios.get(`localhost:1337/bundleref?product_id=${productId}`)// will have to change
+        .then((response)=>{
+          productDesc.push(response);
+          console.log(productDesc, 'producDesc');
+        }).catch((err)=>{
+          console.log(err, 'http error');
+        });
+      res.send(productDesc); // might change to object
+    });
 });
-// Product.fetchAll().then((data)=>{
-//   let array = [];
-//   let br = [];
-//   data.forEach((model)=13>{
-//     array.push(model.attributes);
-//   });
-//   array.forEach((each)=>{
-//     delete each.id;
-//     delete each['inventory count'];
-//   });
-//   array.forEach((item, i)=>{
-//     br.push({index: {_index: 'product', _type: 'product', _id: i}});
-//     br.push({item});
-//   });
-//   return br;
-// }).then((data)=>{
-//   client.bulk({
-//     body: data
-//   }, (err, resp)=>{
-//     if (err) {
-//       console.log(err, 'err');
-//     } else {
-//       console.log(resp);
-//     }
-//   });
-//
-// });
-
-
-
-//fake.fetchAllFromPg();
-
+app.post('/purchase', (req, res)=>{
+  // get the id number
+  // get customer info can use faker for now
+  // sent post reques to purchase service
+  //update info on  the cluster .
+  let purchase = {
+    userid: num,
+    date: date,
+    productId: num,
+    isBundle: boolean,
+    quantity: number,
+    price: number
+  };
+});
 
 app.use(express);
 
