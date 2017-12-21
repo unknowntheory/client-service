@@ -39,6 +39,7 @@ client.ping({
 });
 
 app.get('/search', (req, res)=>{
+  // will have to add a fiter for qty that are not 0
   let count = 0;
   let data = req.query.product;
   //console.log(count);
@@ -77,20 +78,20 @@ app.get('/productInfo', (req, res)=>{
   let productId = req.query.chosenProduct;
   console.log(productId, 'product id');
   let searchParam = {index: 'product', q: productId};
-  return client.search(searchParam)
+  return client.search(searchParam) //supposed to be a request to inv service
     .then((resp)=>{
       return resp;
     }).then((resp)=>{
-      let productDesc = [];// might change to object
-      productDesc.push(resp);
-      axios.get(`localhost:1337/bundleref?product_id=${productId}`)// will have to change
+      let productDesc = {};// might change to object
+      productDesc['query'] = resp;
+      axios.get(`http://localhost:1338/bundleref?product_id=${productId}`)// will have to change
         .then((response)=>{
-          productDesc.push(response);
+          productDesc['bundle'] = response.data;
           console.log(productDesc, 'producDesc');
         }).catch((err)=>{
           console.log(err, 'http error');
         });
-      res.send(productDesc); // might change to object
+      res.send(200, productDesc); // might change to object
     });
 });
 app.post('/purchase', (req, res)=>{
@@ -98,15 +99,36 @@ app.post('/purchase', (req, res)=>{
   // get customer info can use faker for now
   // sent post reques to purchase service
   //update info on  the cluster .
-  let purchase = {
-    userid: num,
-    date: date,
-    productId: num,
-    isBundle: boolean,
-    quantity: number,
-    price: number
+  // default id 500001  and product id 69816
+  // will have to update productid -1 to test because i forgot to add qty .
+  var theScript = {
+    "inline": "ctx._source.item['product id']--"
   };
+
+  client.updateByQuery({
+    index: 'product',
+    body: {
+      'query': {'match': {'_id': '500001'} }, // id will be the product id
+      'script': theScript
+    }
+  }).then((resp)=>{
+    console.log(resp);
+
+  });
+  // let purchase = {
+  //   userid: req.Userid,
+  //   date: '01/01/01', // need to change
+  //   productId: req.productId,
+  //   isBundle: req.bundle,
+  //   quantity: req.qty,
+  //   price: req.price
+  // };
+  // console.log(purhcase);
+  // will make a post to purchase service with purchase object
 });
+
+
+
 
 app.use(express);
 
