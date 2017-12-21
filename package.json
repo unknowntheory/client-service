@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha",
     "server-dev": " nodemon --max-old-space-size=3000  server/index.js",
-    "fake-dev": "node server/fakeData.js"
+    "fake-dev": "node server/fakeData.js",
+    "bundle-server": "nodemon server/bundleServerIndex.js"
   },
   "repository": {
     "type": "git",
