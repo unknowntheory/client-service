@@ -1,0 +1,18 @@
+-make server routes
+/inventory (get request) to database populate database
+/on search query the database for that item.
+
+-make database
+- seed data
+user
+{id:1,name:dan, search:'items'}
+
+
+// when a user clicks a item it makes a request to inventory service with the id.
+// add categories
+// 10,000 29rps
+
+// note to self productid is not unique. will have to change that.
+
+// work on cache make sure it is perfect
+// note** to start redis on windows have to sometime go to client and shut down and restart

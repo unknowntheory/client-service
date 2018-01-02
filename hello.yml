@@ -1,13 +1,16 @@
 config:
-  target: "https://localhost:1337"
+  target: 'http://localhost:1337'
   phases:
-    - duration: 1
-      arrivalRate: 20
+    - duration: 60
+      arrivalRate: 5
+    - duration: 120
+      arrivalRate: 50
+    - duration: 60
+      arrivalRate: 1000
   defaults:
     headers:
       x-my-service-auth: '987401838271002188298567'
 scenarios:
-  - name: "search"
   - flow:
     - get:
-        url: "/search?item=metal"
+        url: "/search?product=Metal"

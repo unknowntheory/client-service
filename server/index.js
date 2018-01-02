@@ -7,9 +7,14 @@ const bookshelf = require('./../database-pg/bookshelf.js');
 const Product = require('./../database-pg/userModels.js');
 const fakeProductData = require('./../fakeProductData.txt');
 var Promise = require('bluebird');
+
 var fs = Promise.promisifyAll(require('fs'));
 var axios = require('axios');
+var redis = require('redis');
+var cache = redis.createClient(); //6379
 
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
 
 
 const app = express();
@@ -19,16 +24,15 @@ var client = new elasticsearch.Client({
   log: 'trace'
 });
 
+cache.on('connect', function() {
+  console.log('connected to cache');
+}); //redis cache
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//var easak = require('greatness');//sike
-// fake.fakerUser() //generate fake users
-// for (var i = 0; i < 100000; i++) {
-//   fake.fakeProduct();// fake product
-// }
+
 client.ping({
-  // ping usually has a 3000ms timeout
   requestTimeout: 60000
 }, function (error) {
   if (error) {
@@ -60,14 +64,53 @@ app.get('/search', (req, res)=>{
     }
   };
 
-  client.search(searchParam, (err, response)=>{
-    if (err) {
-      console.log(err, 'err');
+  // client.search(searchParam, (err, response)=>{
+  //   if (err) {
+  //     console.log(err, 'err');
+  //   } else {
+  //     res.send(200, response);
+  //
+  //     //console.log(response);
+  //   }
+  // });
+
+  cache.getAsync(JSON.stringify(data)).then((resp)=>{
+    //let cache = [];
+    //cache.push(resp);
+    return resp;
+  }).then((response)=>{
+    console.log(response, 'in here cache 1stt layer');
+    let resultsFromQuery = [];
+    if (response !== null) {
+      console.log(response, 'cache');
+      res.send(200, JSON.parse(response));
     } else {
-      res.send(200, response);
-      //console.log(response);
+      console.log('1stlayer else');
+      return client.search(searchParam)
+        .then((response)=>{
+          res.send(200, response);
+          console.log('after res send');
+          cache.set(JSON.stringify(data), JSON.stringify(response.hits.hits));
+        })
+        .catch((err)=>{
+          console.log(err);
+        });
     }
-  });
+  })
+    .catch((err)=>{
+      console.log(err, 'get err');
+    });
+
+  // return client.search(searchParam)
+  //   .then((response)=>{
+  //     console.log(response.hits.hits, 'hits');
+  //     res.send(200, response);
+  //     //cache.rpush([data, response.hits.hits]);
+  //   })
+  //   .catch((err)=>{
+  //     console.log(err);
+  //   });
+
 });
 
 app.get('/productInfo', (req, res)=>{
@@ -87,7 +130,7 @@ app.get('/productInfo', (req, res)=>{
       axios.get(`http://localhost:1338/bundleref?product_id=${productId}`)// will have to change
         .then((response)=>{
           productDesc['bundle'] = response.data;
-          console.log(productDesc, 'producDesc');
+          //console.log(productDesc, 'producDesc');
         }).catch((err)=>{
           console.log(err, 'http error');
         });
@@ -126,7 +169,27 @@ app.post('/purchase', (req, res)=>{
   // console.log(purhcase);
   // will make a post to purchase service with purchase object
 });
-
+app.get('/', (req, res)=>{
+  res.end('hi ..')
+})
+/* for testing purpose */
+// lookUp((id)=>{
+//   let searchParam = {
+//     index: 'product',
+//     body: {
+//       query: {
+//         bool: {
+//           must: {
+//             match: {
+//               'item.productId': id
+//             }
+//           }
+//         }
+//       }
+//     }
+//   };
+//   client.search(searchParam);
+// });
 
 
 
@@ -134,4 +197,6 @@ app.use(express);
 
 
 app.listen(1337, () => console.log('listening on port 1337'));
+app.listen(1338, () => console.log('listening on port 1338'));
+app.listen(1339, ()=>console.log('yea'));
 module.exports = app;

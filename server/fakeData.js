@@ -5,7 +5,7 @@ const faker = require('faker');// faker module for fake data
 const app = express();
 app.use(express);
 
-for (var i = 0; i < 10; i++) {
+for (var i = 0; i < 35; i++) {
 
   let fakeId = faker.random.number();
   let fakeProductName = faker.commerce.productName();
@@ -22,9 +22,9 @@ for (var i = 0; i < 10; i++) {
   //   'inventory count': fakeInventoryCount
 
 
-  let product = `'${fakeId}','${fakeProductName}','${loremProductDesc}','${fakeInventoryCount(30, 1000)}'\n`;  // test using a number instead of a string for inv count
+  let product = `${fakeId},'${fakeProductName}','${loremProductDesc}',${fakeInventoryCount(30, 1000)}\n`;  // test using a number instead of a string for inv count
 
-  fs.appendFile('fakeProductData.txt', product, (err)=>{
+  fs.appendFile('fakeSandBox.csv', product, (err)=>{
     if (err) {
       console.log(err, 'err');
     }
