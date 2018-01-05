@@ -1,0 +1,60 @@
+@import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css");
+
+
+.foodTile{
+  border-radius: 15px 15px 15px 15px;
+  opacity: 0.85;
+  padding: 5px;
+  width:250px;
+  height:250px;
+
+}
+.foodTile:hover {
+    opacity: 1.0;
+    filter: alpha(opacity=100); /* For IE8 and earlier */
+}
+.tileContainer{
+  /*border: 5px solid red;*/
+
+
+}
+.foodTitleName{
+  text-align: center;
+  width: 250px;
+}
+.bottom-half{
+  margin-top: 50px;
+  padding-top: 50px;
+
+}
+ul{
+  list-style: none;
+
+}
+.list{
+
+  margin:0px;
+}
+.inf-li{
+
+  margin-left: 10px;
+
+}
+.info-container{
+  text-align: center;
+}
+.ing-title{
+  text-align: center;
+}
+.ins-div{
+  margin-top: 50px;
+}
+.instructions-btn{
+  margin-left: 50%
+}
+.title{
+  text-align: center;
+}
+.container-fluid{
+  font-family: 'Roboto', sans-serif;
+}

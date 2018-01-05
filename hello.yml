@@ -1,16 +1,22 @@
 config:
   target: 'http://localhost:1337'
   phases:
-    - duration: 60
-      arrivalRate: 5
-    - duration: 120
-      arrivalRate: 50
-    - duration: 60
-      arrivalRate: 1000
+    - duration: 1
+      arrivalRate: 10000
+  processor: "./load_test_functions.js"
   defaults:
     headers:
       x-my-service-auth: '987401838271002188298567'
 scenarios:
-  - flow:
+  - name: "search a product"
+    flow:
+    - function: "searchRandomProduct"
     - get:
-        url: "/search?product=Metal"
+        url: "/search?product={{product}}"
+    -log: "sent a request to /search"
+  - name: "select a product"
+    flow:
+    - function: "clickAProduct"
+    - get:
+       url: "/productInfo?chosenProduct={{productId}}"
+    -log: "sent a request to /productInfo"

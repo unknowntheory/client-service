@@ -1,0 +1,16 @@
+config:
+  target: 'http://localhost:1337'
+  phases:
+    - duration: 1
+      arrivalRate: 10000
+  processor: "./load_test_functions.js"
+  defaults:
+    headers:
+      x-my-service-auth: '987401838271002188298567'
+scenarios:
+  - name: "search a product"
+    flow:
+    - function: "searchRandomProduct"
+    - get:
+        url: "/search?product={{product}}"
+    -log: "sent a request to /search"

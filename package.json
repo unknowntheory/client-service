@@ -36,7 +36,8 @@
     "pg": "^7.4.0",
     "redis": "^2.8.0",
     "request": "^2.83.0",
-    "save": "^2.3.2"
+    "save": "^2.3.2",
+    "through2-batch": "^1.1.0"
   },
   "devDependencies": {
     "chai-http": "^3.0.0",
