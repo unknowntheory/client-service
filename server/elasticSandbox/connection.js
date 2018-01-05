@@ -10,6 +10,26 @@ var client = new elasticsearch.Client({
   host: 'localhost:9200',
   log: 'trace'
 });
+//
+// client.index({
+//   index: 'product',
+//   type: 'product',
+//   id: '333',
+//   body: {
+//     'productId': 3333,
+//     'productName': 'testtestrith',
+//     'productDescription': 'ipsum',
+//     'inventoryCount': 3333
+//   }
+// }, function (error, response) {
+//   if (response) {
+//     console.log('saved');
+//   } else {
+//     console.log(error);
+//   }
+// });
+
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
