@@ -49,67 +49,72 @@ app.get('/search', (req, res)=>{
   //console.log(count);
   count++;
   console.log(count);
+  //filter below
   let searchParam = {
-    index: 'product',
+    index: 'sandbox',
     body: {
       query: {
-        bool: {
-          must: {
-            match: {
-              'item.product name': data
-            }
-          }
+        match: {
+          'productName': data
         }
       }
     }
   };
+  //  filter above
+  // no filter below
+  let searchParam2 = {
+    index: 'sandbox',
+    q: data
+  };
+  // no filter above
 
-  // client.search(searchParam, (err, response)=>{
-  //   if (err) {
-  //     console.log(err, 'err');
+//   client.search(searchParam, (err, response)=>{
+//     if (err) {
+//       console.log(err, 'err');
+//     } else {
+//       res.send(200, response);
+//
+//       //console.log(response);
+//     }
+//   });
+// /cache function below
+  // cache.getAsync(JSON.stringify(data)).then((resp)=>{
+  //   //let cache = [];
+  //   //cache.push(resp);
+  //   return resp;
+  // }).then((response)=>{
+  //   console.log(response, 'in here cache 1stt layer');
+  //   let resultsFromQuery = [];
+  //   if (response !== null) {
+  //     console.log(response, 'cache');
+  //     res.send(200, JSON.parse(response));
   //   } else {
-  //     res.send(200, response);
-  //
-  //     //console.log(response);
+  //     console.log('1stlayer else');
+  //     return client.search(searchParam)
+  //       .then((response)=>{
+  //         res.send(200, response);
+  //         console.log('after res send');
+  //         cache.set(JSON.stringify(data), JSON.stringify(response.hits.hits));
+  //       })
+  //       .catch((err)=>{
+  //         console.log(err);
+  //       });
   //   }
-  // });
-
-  cache.getAsync(JSON.stringify(data)).then((resp)=>{
-    //let cache = [];
-    //cache.push(resp);
-    return resp;
-  }).then((response)=>{
-    console.log(response, 'in here cache 1stt layer');
-    let resultsFromQuery = [];
-    if (response !== null) {
-      console.log(response, 'cache');
-      res.send(200, JSON.parse(response));
-    } else {
-      console.log('1stlayer else');
-      return client.search(searchParam)
-        .then((response)=>{
-          res.send(200, response);
-          console.log('after res send');
-          cache.set(JSON.stringify(data), JSON.stringify(response.hits.hits));
-        })
-        .catch((err)=>{
-          console.log(err);
-        });
-    }
-  })
-    .catch((err)=>{
-      console.log(err, 'get err');
-    });
-
-  // return client.search(searchParam)
-  //   .then((response)=>{
-  //     console.log(response.hits.hits, 'hits');
-  //     res.send(200, response);
-  //     //cache.rpush([data, response.hits.hits]);
-  //   })
+  // })
   //   .catch((err)=>{
-  //     console.log(err);
+  //     console.log(err, 'get err');
   //   });
+// cache function above
+
+  return client.search(searchParam2)
+    .then((response)=>{
+      // console.log(response.hits.hits, 'hits');
+      res.send(200, response);
+      //cache.rpush([data, response.hits.hits]);
+    })
+    .catch((err)=>{
+      console.log(err);
+    });
 
 });
 
@@ -137,6 +142,8 @@ app.get('/productInfo', (req, res)=>{
       res.send(200, productDesc); // might change to object
     });
 });
+
+
 app.post('/purchase', (req, res)=>{
   // get the id number
   // get customer info can use faker for now
@@ -158,6 +165,7 @@ app.post('/purchase', (req, res)=>{
     console.log(resp);
 
   });
+  res.status(200);
   // let purchase = {
   //   userid: req.Userid,
   //   date: '01/01/01', // need to change
@@ -170,8 +178,8 @@ app.post('/purchase', (req, res)=>{
   // will make a post to purchase service with purchase object
 });
 app.get('/', (req, res)=>{
-  res.end('hi ..')
-})
+  res.end('hi ..');
+});
 /* for testing purpose */
 // lookUp((id)=>{
 //   let searchParam = {

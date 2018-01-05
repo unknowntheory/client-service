@@ -4,8 +4,8 @@ const fs = require('fs');
 const faker = require('faker');// faker module for fake data
 const app = express();
 app.use(express);
-
-for (var i = 0; i < 35; i++) {
+let arr = [];
+for (var i = 700000; i < 800000; i++) {
 
   let fakeId = faker.random.number();
   let fakeProductName = faker.commerce.productName();
@@ -22,16 +22,19 @@ for (var i = 0; i < 35; i++) {
   //   'inventory count': fakeInventoryCount
 
 
-  let product = `${fakeId},'${fakeProductName}','${loremProductDesc}',${fakeInventoryCount(30, 1000)}\n`;  // test using a number instead of a string for inv count
-
-  fs.appendFile('fakeSandBox.csv', product, (err)=>{
-    if (err) {
-      console.log(err, 'err');
-    }
-    console.log('The "data to append" was appended to file!');
-  });
+  let product = `${i},'${fakeProductName}','${loremProductDesc}',${fakeInventoryCount(30, 1000)}\n`;  // test using a number instead of a string for inv count
+  arr.push(product);
+  // fs.createWriteStream('firstOneMill.csv', product, (err)=>{
+  //   if (err) {
+  //     throw err;
+  //   }
+  //   console.log('The "data to write" was written to file!');
+  // });
 }
-
+var stream = fs.createWriteStream("eighthundredthousand.csv", {flags:'a'});
+arr.forEach((x)=>{
+  stream.write(x);
+})
 
 
 
